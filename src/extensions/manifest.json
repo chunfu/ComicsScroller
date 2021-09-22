@@ -32,8 +32,10 @@
     "tabs",
     "activeTab",
     "http://*.comicbus.com/*",
+    "https://*.comicbus.com/*",
     "http://*.sfacg.com/*",
     "http://*.dm5.com/*",
+    "https://*.dm5.com/*",
     "http://*.cdndm5.com/*",
     "http://localhost:8000/*"
   ],

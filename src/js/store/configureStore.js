@@ -4,7 +4,9 @@ import { createEpicMiddleware } from 'redux-observable';
 import rootReducer from '../reducers';
 import rootEpic from '../epics';
 
-const logger = createLogger();
+const logger = createLogger({
+  predicate: () => process.env.LOG_REDUX === 'true',
+});
 const epicMiddleware = createEpicMiddleware(rootEpic);
 
 let createStoreWithMiddleware = applyMiddleware(epicMiddleware, logger)(

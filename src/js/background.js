@@ -6,9 +6,9 @@ import { fetchChapterPage$ as fetchChapterPage$Dm5 } from './container/App/reduc
 import { fetchChapterPage$ as fetchChapterPage$Sf } from './container/App/reducers/sfEpic';
 import { fetchChapterPage$ as fetchChapterPage$comicbus } from './container/App/reducers/comicBusEpic';
 
-const dm5Regex = /http\:\/\/(tel||www)\.dm5\.com\/(m\d+)\//;
-const sfRegex = /http\:\/\/comic\.sfacg\.com\/(HTML\/[^\/]+\/.+)$/;
-const comicbusRegex = /http\:\/\/(www|v)\.comicbus.com\/online\/(comic-\d+\.html\?ch=.*$)/;
+const dm5Regex = /https?\:\/\/(tel||www)\.dm5\.com\/(m\d+)\//;
+const sfRegex = /https?\:\/\/comic\.sfacg\.com\/(HTML\/[^\/]+\/.+)$/;
+const comicbusRegex = /https?\:\/\/(www|v)\.comicbus.com\/online\/(comic-\d+\.html\?ch=.*$)/;
 
 declare var chrome: any;
 declare var ga: any;
@@ -33,7 +33,7 @@ function dm5RefererHandler(details) {
 
 function dm5CookieHandler(details) {
   return {
-    requestHeaders: map(details.requestHeaders, item => {
+    requestHeaders: map(details.requestHeaders, (item) => {
       if (item.name === 'Cookie') {
         return {
           name: item.name,
@@ -62,22 +62,22 @@ chrome.browserAction.setBadgeBackgroundColor({ color: '#F00' });
 chrome.webRequest.onBeforeSendHeaders.addListener(
   dm5RefererHandler,
   { urls: ['http://www.dm5.com/m*/chapterfun*', 'http://*.cdndm5.com/*'] },
-  ['requestHeaders', 'blocking', 'extraHeaders'],
+  ['requestHeaders', 'blocking', 'extraHeaders']
 );
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
   dm5CookieHandler,
   { urls: ['http://www.dm5.com/m*/'] },
-  ['requestHeaders', 'blocking', 'extraHeaders'],
+  ['requestHeaders', 'blocking', 'extraHeaders']
 );
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
   sfRefererHandler,
   { urls: ['http://*.sfacg.com/*'] },
-  ['requestHeaders', 'blocking', 'extraHeaders'],
+  ['requestHeaders', 'blocking', 'extraHeaders']
 );
 
-chrome.notifications.onClicked.addListener(id => {
+chrome.notifications.onClicked.addListener((id) => {
   if (id !== 'Comics Scroller Update') {
     chrome.tabs.create({ url: id });
   }
@@ -85,7 +85,7 @@ chrome.notifications.onClicked.addListener(id => {
 });
 
 function comicsQuery() {
-  chrome.storage.local.get(item => {
+  chrome.storage.local.get((item) => {
     if (typeof item !== 'undefined' && typeof item.subscribe !== 'undefined') {
       chrome.browserAction.setBadgeText({
         text: `${item.update.length > 0 ? item.update.length : ''}`,
@@ -96,9 +96,9 @@ function comicsQuery() {
         fetchChapterPage(chapterURL).subscribe(
           ({ title, chapterList, coverURL, chapters }) => {
             const comic = item[site][comicsID];
-            forEach(chapterList, chapterID => {
+            forEach(chapterList, (chapterID) => {
               if (!comic.chapters[chapterID]) {
-                chrome.storage.local.get(oldStore =>
+                chrome.storage.local.get((oldStore) =>
                   chrome.storage.local.set(
                     {
                       ...oldStore,
@@ -126,26 +126,26 @@ function comicsQuery() {
                       ],
                     },
                     () => {
-                      chrome.storage.local.get(store =>
+                      chrome.storage.local.get((store) =>
                         chrome.browserAction.setBadgeText({
                           text: `${store.update.length}`,
-                        }),
+                        })
                       );
-                    },
-                  ),
+                    }
+                  )
                 );
               }
             });
-          },
+          }
         );
       });
     }
   });
 }
 
-chrome.runtime.onInstalled.addListener(details => {
+chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'update') {
-    chrome.storage.local.get(item => {
+    chrome.storage.local.get((item) => {
       const { version } = chrome.runtime.getManifest();
       delete item.udpate;
       if (!item.version) {
@@ -168,43 +168,33 @@ chrome.runtime.onInstalled.addListener(details => {
 });
 
 chrome.webNavigation.onBeforeNavigate.addListener(
-  details => {
+  (details) => {
     if (comicbusRegex.test(details.url)) {
       console.log('comicbus fired');
       const chapter = comicbusRegex.exec(details.url)[2];
       chrome.tabs.update(details.tabId, {
         url: `${chrome.extension.getURL(
-          'app.html',
+          'app.html'
         )}?site=comicbus&chapter=${chapter}`,
       });
-      ga('send', 'event', 'comicbus view');
     } else if (sfRegex.test(details.url)) {
       console.log('sf fired');
       const chapter = sfRegex.exec(details.url)[1];
       chrome.tabs.update(details.tabId, {
         url: `${chrome.extension.getURL(
-          'app.html',
+          'app.html'
         )}?site=sf&chapter=${chapter}`,
       });
-      ga('send', 'event', 'sf view');
     } else if (dm5Regex.test(details.url)) {
       console.log('dm5 fired');
       let chapter = '';
       chapter = dm5Regex.exec(details.url)[2];
       chrome.tabs.update(details.tabId, {
         url: `${chrome.extension.getURL(
-          'app.html',
+          'app.html'
         )}?site=dm5&chapter=${chapter}`,
       });
-      ga('send', 'event', 'dm5 view');
     }
-  },
-  {
-    url: [
-      { urlMatches: 'comicbus.com/online/.*$' },
-      { urlMatches: 'comic.sfacg.com/HTML/[^/]+/.+$' },
-      { urlMatches: 'http://(tel||www).dm5.com/md*' },
-    ],
   },
 );
 
@@ -213,19 +203,8 @@ chrome.alarms.create('comcisScroller', {
   periodInMinutes: 10,
 });
 
-chrome.alarms.onAlarm.addListener(alarm => {
+chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'comcisScroller') {
     comicsQuery();
   }
 });
-
-/* eslint-disable */
-// prettier-ignore
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-// $FlowFixMe
-m=s.getElementsByTagName(o)[0];a.alocal=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://ssl.google-analytics.com/analytics.js','ga');
-ga('create', 'UA-59728771-1', 'auto');
-ga('set', 'checkProtocolTask', null);
-ga('send', 'pageview');

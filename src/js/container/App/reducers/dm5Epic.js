@@ -27,7 +27,7 @@ import {
 } from './comics';
 import { startScroll } from './scrollEpic';
 
-const baseURL = 'http://www.dm5.com';
+const baseURL = 'https://www.dm5.com';
 const FETCH_CHAPTER = 'FETCH_CHAPTER';
 const FETCH_IMAGE_SRC = 'FETCH_IMAGE_SRC';
 const FETCH_IMG_LIST = 'FETCH_IMG_LIST';

@@ -15,6 +15,11 @@ module.exports = {
       'webpack-dev-server/client?http://localhost:8000',
       'webpack/hot/only-dev-server',
       './src/js/popup'
+    ],
+    background: [
+      'webpack-dev-server/client?http://localhost:8000',
+      'webpack/hot/only-dev-server',
+      './src/js/background'
     ]
   },
   output: {
