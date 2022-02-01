@@ -22,6 +22,7 @@ import {
 import { fetchImgList, fetchChapter, updateReaded } from './reducers/getAction';
 import { stopScroll } from './reducers/scrollEpic';
 import { startResize } from './reducers/resizeEpic';
+import { asyncIframe } from '../../util/asyncIframe';
 
 declare var chrome: any;
 
@@ -37,6 +38,7 @@ class App extends Component {
     comicsID: string,
     chapter: string,
     chapterTitle: string,
+    chapterUrl: string,
     chapterList: Array<*>,
     site: string,
     chapterNowIndex: number,
@@ -55,6 +57,7 @@ class App extends Component {
 
   state = {
     showChapterList: false,
+    isIframeLoad: false,
   };
 
   componentDidMount() {
@@ -80,6 +83,18 @@ class App extends Component {
     });
     const chapter = window.location.search.split('&chapter=')[1];
     this.props.fetchChapter(chapter);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const prevChapterUrl = prevProps.chapterUrl;
+    const currentChapterUrl = this.props.chapterUrl;
+    if (currentChapterUrl && (currentChapterUrl !== prevChapterUrl)) {
+      asyncIframe(this.props.chapterUrl).then(
+        () => {
+          console.log('****chapterurl', this.props.chapterUrl);
+        }
+      );
+    }
   }
 
   showChapterListHandler = () => {
@@ -163,7 +178,7 @@ class App extends Component {
               <MenuIcon className={cn.icon} />
             </IconButton>
             <span>Comics Scroller</span>
-            <a target="_blank" href={this.props.chapterURL}>{`${
+            <a target="_blank" href={this.props.comicUrl}>{`${
               this.props.title
             }`}</a>
             <span>></span>
@@ -236,13 +251,17 @@ function mapStateToProps(state) {
       chapterList.length > 0 && chapters[chapterID]
         ? chapters[chapterID].chapter
         : '',
+    chapterUrl:
+      chapterList.length > 0 && chapters[chapterID]
+        ? chapters[chapterID].href
+        : '',
     chapterList,
     prevable: chapterNowIndex < chapterList.length,
     nextable: chapterNowIndex > 0,
     chapterNowIndex,
     comicsID,
     subscribe,
-    chapterURL: `${baseURL}/${comicsID}`,
+    comicUrl: `${baseURL}/${comicsID}`,
   };
 }
 

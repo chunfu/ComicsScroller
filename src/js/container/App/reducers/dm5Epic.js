@@ -5,13 +5,16 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/retry';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/throw';
 import map from 'lodash/map';
 import findIndex from 'lodash/findIndex';
 import filter from 'lodash/filter';
 import reduce from 'lodash/reduce';
 import some from 'lodash/some';
+import { unpackSource } from '../../../unpack';
 import {
   updateTitle,
   updateComicsID,
@@ -41,6 +44,13 @@ function fetchImgs$(chapter) {
     const node = response.querySelector('div.title > span:nth-child(2) > a');
     const script = response.querySelector('head')
       .textContent;
+
+    const findKeyScript = response.querySelector('#dm5_key').nextElementSibling.textContent;
+    const scriptWithKey = unpackSource(findKeyScript);
+    const keyValueStatement = scriptWithKey.split(';')[1]
+    eval(keyValueStatement.replace('var', 'var myVar ='));
+
+    const DM5_KEY = myVar;
     const DM5_IMAGE_COUNT = /DM5_IMAGE_COUNT=(\d+);/.exec(script)[1];
     const DM5_CID = /DM5_CID=(\d+);/.exec(script)[1];
     const DM5_CURL = /DM5_CURL\s*=\s*\"\/(m\d+\/)\"/.exec(script)[1];
@@ -52,7 +62,7 @@ function fetchImgs$(chapter) {
         `${baseURL}/${DM5_CURL}chapterfun.ashx?` +
         `cid=${DM5_CID}` +
         `&page=${k + 1}` +
-        `&key=` +
+        `&key=${DM5_KEY}` +
         `&language=1` +
         `&gtk=6` +
         `&_cid=${DM5_CID}` +

@@ -169,6 +169,10 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 chrome.webNavigation.onBeforeNavigate.addListener(
   (details) => {
+    const { frameId } = details;
+    // do nothing for iframe
+    if (frameId > 0) return;
+
     if (comicbusRegex.test(details.url)) {
       console.log('comicbus fired');
       const chapter = comicbusRegex.exec(details.url)[2];
