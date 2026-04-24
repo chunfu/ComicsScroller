@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>sandbox</title>
+</head>
+<body>
+<script>
+  // Sandboxed page: null origin, no chrome API access, but unsafe-eval is allowed.
+  // Accepts { id, kind, payload } messages and returns { id, ok, result?, error? }.
+  window.addEventListener('message', function (event) {
+    var msg = event.data || {};
+    var id = msg.id;
+    var kind = msg.kind;
+    var payload = msg.payload;
+    var reply = { id: id, ok: false };
+    try {
+      if (kind === 'dm5') {
+        // Response text defines one of: d=[...], hd_c=[...]+isrevtt=true, or returns an array.
+        var src, d, isrevtt, hd_c;
+        var arr = eval(payload);
+        if (hd_c && hd_c.length > 0 && isrevtt) {
+          src = hd_c[0];
+        } else if (typeof d !== 'undefined') {
+          src = d[0];
+        } else if (arr) {
+          src = arr[0];
+        }
+        reply.ok = true;
+        reply.result = { src: src };
+      } else if (kind === 'sf') {
+        // sfacg: script defines picCount, hosts, picAy
+        var picCount, hosts, picAy;
+        eval(payload);
+        reply.ok = true;
+        reply.result = { picCount: picCount, hosts: hosts, picAy: picAy };
+      } else if (kind === 'comicbus') {
+        // comicbus: the <script> block from chapter page defines chs, cs, ti
+        var chs, cs, ti;
+        eval(payload);
+        reply.ok = true;
+        reply.result = { chs: chs, cs: cs, ti: ti };
+      } else {
+        reply.error = 'unknown kind: ' + kind;
+      }
+    } catch (err) {
+      reply.error = String(err && err.message ? err.message : err);
+    }
+    event.source.postMessage(reply, event.origin === 'null' ? '*' : event.origin);
+  });
+</script>
+</body>
+</html>
