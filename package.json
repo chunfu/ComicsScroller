@@ -5,11 +5,8 @@
   "scripts": {
     "clean": "shx rm -rf ./ComicsScroller",
     "mkdir": "shx mkdir -p ./ComicsScroller/js && shx mkdir -p ./ComicsScroller/css",
-    "copy:dev": "shx cp -r ./src/extensions/* ./ComicsScroller/ && shx rm -rf ./ComicsScroller/{app,popup}.html && shx mv ./ComicsScroller/app_dev.html ./ComicsScroller/app.html && shx mv ./ComicsScroller/popup_dev.html ./ComicsScroller/popup.html",
-    "set:dev": "npm run clean && npm run mkdir && npm run copy:dev ",
-    "start": "better-npm-run start",
     "compile:background": "webpack --config webpack.config.bg.js",
-    "copy:prod": "shx cp -r ./src/extensions/* ./ComicsScroller/ && shx rm -rf ./ComicsScroller/{app,popup}_dev.html",
+    "copy:prod": "shx cp -r ./src/extensions/* ./ComicsScroller/",
     "set:prod": "npm run clean && npm run mkdir && npm run copy:prod",
     "product": "better-npm-run product",
     "zip": "shx rm -rf *.zip && bestzip ComicsScroller.zip ./ComicsScroller",
@@ -17,12 +14,6 @@
     "test": "jest"
   },
   "betterScripts": {
-    "start": {
-      "command": "npm run set:dev && npm run compile:background && node server.js",
-      "env": {
-        "NODE_ENV": "development"
-      }
-    },
     "product": {
       "command": "npm run set:prod && npm run compile:background && webpack --config webpack.config.prod.js",
       "env": {

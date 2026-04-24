@@ -27,8 +27,9 @@ import {
   updateSubscribe,
 } from './comics';
 import { startScroll } from './scrollEpic';
+import { evalInSandbox } from '../../../util/sandbox';
 
-const baseURL = 'http://www.comicbus.com';
+const baseURL = 'https://www.comicbus.com';
 const FETCH_CHAPTER = 'FETCH_CHAPTER';
 const FETCH_IMAGE_SRC = 'FETCH_IMAGE_SRC';
 const FETCH_IMG_LIST = 'FETCH_IMG_LIST';
@@ -44,12 +45,17 @@ function fetchImgs$(chapter: string) {
     url: `${baseURL}/online/${chapter}`,
     responseType: 'document',
   }).mergeMap(function fetchImgPageHandler({ response }) {
-    /* eslint-disable */
-    eval(
-      /(var chs.*var cs=\'[^']+\';)/.exec(
-        response.querySelector('#Form1 > script').textContent,
-      )[1],
+    const scriptText = response.querySelector('#Form1 > script').textContent;
+    return Observable.from(
+      evalInSandbox('comicbus', scriptText).then(({ chs, cs, ti }) =>
+        buildComicbusImgList(chapter, chs, cs, ti),
+      ),
     );
+  });
+}
+
+function buildComicbusImgList(chapter, chs, cs, ti) {
+  /* eslint-disable */
     let ch = /.*ch\=(.*)/.exec(chapter)[1];
     if (ch.indexOf('#') > 0) {
       ch = ch.split('#')[0];
@@ -113,9 +119,8 @@ function fetchImgs$(chapter: string) {
       });
     }
     // $FlowFixMe
-    return Observable.of({ imgList, comicsID: ti });
+    return { imgList, comicsID: ti };
     /* eslint-enable */
-  });
 }
 
 export function fetchImgSrcEpic(action$: any, store: Store) {
@@ -279,7 +284,7 @@ export function fetchChapterEpic(action$: any) {
                   },
                 },
               };
-              chrome.browserAction.setBadgeText({
+              chrome.action.setBadgeText({
                 text: `${
                   newItem.update.length === 0 ? '' : newItem.update.length
                 }`,
@@ -294,7 +299,7 @@ export function fetchChapterEpic(action$: any) {
                 Observable.bindCallback(chrome.storage.local.set)(
                   newItem,
                 ).mergeMap(() => {
-                  chrome.browserAction.setBadgeText({
+                  chrome.action.setBadgeText({
                     text: `${
                       newItem.update.length === 0 ? '' : newItem.update.length
                     }`,
@@ -357,7 +362,7 @@ export function updateReadedEpic(action$: any, store: { getState: Function }) {
       return Observable.bindCallback(chrome.storage.local.set)(
         newItem,
       ).mergeMap(() => {
-        chrome.browserAction.setBadgeText({
+        chrome.action.setBadgeText({
           text: `${newItem.update.length === 0 ? '' : newItem.update.length}`,
         });
         return [
