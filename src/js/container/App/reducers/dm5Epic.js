@@ -26,8 +26,9 @@ import {
   updateSubscribe,
 } from './comics';
 import { startScroll } from './scrollEpic';
+import { evalInSandbox } from '../../../util/sandbox';
 
-const baseURL = 'http://www.dm5.com';
+const baseURL = 'https://www.dm5.com';
 const FETCH_CHAPTER = 'FETCH_CHAPTER';
 const FETCH_IMAGE_SRC = 'FETCH_IMAGE_SRC';
 const FETCH_IMG_LIST = 'FETCH_IMG_LIST';
@@ -86,20 +87,12 @@ export function fetchImgSrcEpic(action$, store) {
           url: entity[id].src,
           responseType: 'text',
           contentType: 'text/html; charset=utf-8',
-        }).map(function fetchImgSrcHandler({ response }) {
-          /* eslint-disable */
-          let src, d, isrevtt, hd_c;
-          // $FlowFixMe
-          const arr = eval(response);
-          if (hd_c && hd_c.length > 0 && isrevtt) {
-            src = hd_c[0];
-          } else if (typeof d !== 'undefined') {
-            src = d[0];
-          } else if (arr) {
-            src = arr[0];
-          }
-          return loadImgSrc(src, id);
-          /* eslint-enable */
+        }).mergeMap(function fetchImgSrcHandler({ response }) {
+          return Observable.from(
+            evalInSandbox('dm5', response).then(({ src }) =>
+              loadImgSrc(src, id),
+            ),
+          );
         });
       });
   });
@@ -222,7 +215,7 @@ export function fetchChapterEpic(action$, store) {
               );
               store.dispatch(updateSubscribe(subscribe))
               chrome.storage.local.set(newItem, () => {
-                chrome.browserAction.setBadgeText({
+                chrome.action.setBadgeText({
                   text: `${
                     newItem.update.length === 0 ? '' : newItem.update.length
                     }`,
@@ -278,7 +271,7 @@ export function updateReadedEpic(action$, store) {
         },
       };
       chrome.storage.local.set(newItem, () => {
-        chrome.browserAction.setBadgeText({
+        chrome.action.setBadgeText({
           text: `${newItem.update.length === 0 ? '' : newItem.update.length}`,
         });
         store.dispatch(updateReadedChapters(newItem.dm5[comicsID].readedChapters))

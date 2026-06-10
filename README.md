@@ -36,16 +36,11 @@ or
 ```
 yarn
 ```
-## Run dev server
-```
-npm start
-```
-And then you can go to chrome://extensions add your-project-path/ComicsScroller to your chrome for developing with hot-reload  
-
-## Build extension  
+## Build extension
 ```
 npm run product
 ```
+Then go to chrome://extensions, enable Developer Mode, and "Load unpacked" → select `./ComicsScroller`.
 
 ## Test
 Use jest to test.  

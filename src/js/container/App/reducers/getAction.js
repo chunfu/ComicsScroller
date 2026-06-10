@@ -37,17 +37,17 @@ function getInfor(site) {
     case 'dm5':
       return {
         site,
-        baseURL: 'http://www.dm5.com',
+        baseURL: 'https://www.dm5.com',
       };
     case 'sf':
       return {
         site,
-        baseURL: 'http://comic.sfacg.com',
+        baseURL: 'https://comic.sfacg.com',
       };
     case 'comicbus':
       return {
         site,
-        baseURL: 'http://www.comicbus.com',
+        baseURL: 'https://www.comicbus.com',
       };
     default:
       return {};

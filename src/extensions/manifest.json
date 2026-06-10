@@ -1,7 +1,7 @@
 {
   "name": "Comics Scroller",
-  "version": "4.0.28",
-  "manifest_version": 2,
+  "version": "4.1.0",
+  "manifest_version": 3,
   "description": "一個支援動漫屋、無限動漫、sfacg，給你更好的漫畫閱讀體驗的 chrome extension ",
   "icons": {
     "16": "imgs/comics-16.png",
@@ -9,7 +9,7 @@
     "64": "imgs/comics-64.png",
     "128": "imgs/comics-128.png"
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "imgs/comics-16.png"
     },
@@ -17,29 +17,55 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "page": "background.html",
-    "persistence": false
+    "service_worker": "js/background.js"
   },
   "permissions": [
     "webNavigation",
     "alarms",
     "unlimitedStorage",
     "notifications",
-    "webRequest",
-    "webRequestBlocking",
     "cookies",
     "storage",
     "tabs",
     "activeTab",
-    "http://*.comicbus.com/*",
-    "http://*.sfacg.com/*",
-    "http://*.dm5.com/*",
-    "http://*.cdndm5.com/*",
-    "http://localhost:8000/*"
+    "declarativeNetRequestWithHostAccess"
   ],
-  "content_security_policy": "img-src 'self' data: * ; script-src 'self' 'unsafe-eval' https://*.google-analytics.com https://ajax.googleapis.com http://localhost:8000; object-src 'self' ; ",
+  "host_permissions": [
+    "https://*.dm5.com/*",
+    "http://*.dm5.com/*",
+    "https://*.cdndm5.com/*",
+    "http://*.cdndm5.com/*",
+    "https://*.sfacg.com/*",
+    "http://*.sfacg.com/*",
+    "https://*.comicbus.com/*",
+    "http://*.comicbus.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: https: http:;"
+  },
+  "sandbox": {
+    "pages": ["sandbox.html"]
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "cs_rules",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
   "web_accessible_resources": [
-    "js/*.js",
-    "css/*.css"
+    {
+      "resources": ["js/*.js", "css/*.css", "sandbox.html"],
+      "matches": [
+        "https://*.dm5.com/*",
+        "http://*.dm5.com/*",
+        "https://*.sfacg.com/*",
+        "http://*.sfacg.com/*",
+        "https://*.comicbus.com/*",
+        "http://*.comicbus.com/*"
+      ]
+    }
   ]
 }

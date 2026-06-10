@@ -205,7 +205,7 @@ class PopUpApp extends Component {
         if (!err) {
           chrome.storage.local.get(item => {
             this.props.updatePopupData(item);
-            chrome.browserAction.setBadgeText({
+            chrome.action.setBadgeText({
               text: `${item.update.length === 0 ? '' : item.update.length}`,
             });
             chrome.runtime.sendMessage({ msg: 'UPDATE' });
@@ -239,7 +239,7 @@ class PopUpApp extends Component {
     chrome.storage.local.set(initObject, () => {
       chrome.storage.local.get(item => {
         this.props.updatePopupData(item);
-        chrome.browserAction.setBadgeText({
+        chrome.action.setBadgeText({
           text: `${item.update.length === 0 ? '' : item.update.length}`,
         });
         chrome.runtime.sendMessage({ msg: 'UPDATE' });

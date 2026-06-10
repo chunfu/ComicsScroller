@@ -117,7 +117,7 @@ class ComicCard extends Component {
       }
       chrome.storage.local.set(newStore, err => {
         if (!err) {
-          chrome.browserAction.setBadgeText({
+          chrome.action.setBadgeText({
             text: `${
               newStore.update.length === 0 ? '' : newStore.update.length
             }`,

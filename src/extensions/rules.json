@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "Referer", "operation": "set", "value": "https://www.dm5.com/m" }
+      ]
+    },
+    "condition": {
+      "regexFilter": "^https?://www\\.dm5\\.com/m\\d+/chapterfun",
+      "resourceTypes": ["xmlhttprequest"]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "Referer", "operation": "set", "value": "https://www.dm5.com/m" }
+      ]
+    },
+    "condition": {
+      "regexFilter": "^https?://[^/]*cdndm5\\.com/",
+      "resourceTypes": ["xmlhttprequest", "image"]
+    }
+  },
+  {
+    "id": 3,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "Referer", "operation": "set", "value": "https://comic.sfacg.com/HTML/" }
+      ]
+    },
+    "condition": {
+      "regexFilter": "^https?://[^/]*sfacg\\.com/",
+      "resourceTypes": ["xmlhttprequest", "image"]
+    }
+  }
+]
